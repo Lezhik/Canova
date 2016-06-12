@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.canova.api.conf.Configuration;
 import org.canova.api.io.data.DoubleWritable;
 import org.canova.api.io.labels.PathLabelGenerator;
+import org.canova.api.io.labels.PathListLabelGenerator;
 import org.canova.api.records.reader.BaseRecordReader;
 import org.canova.api.split.FileSplit;
 import org.canova.api.split.InputSplit;
@@ -73,6 +74,13 @@ public abstract class BaseImageRecordReader extends BaseRecordReader {
     public BaseImageRecordReader() {
     }
 
+    public BaseImageRecordReader(int height, int width, int channels) {
+        this.height = height;
+        this.width = width;
+        this.channels = channels;
+        this.appendLabel = true;
+    }
+
     public BaseImageRecordReader(int height, int width, int channels, PathLabelGenerator labelGenerator) {
         this.height = height;
         this.width = width;
@@ -87,7 +95,6 @@ public abstract class BaseImageRecordReader extends BaseRecordReader {
         this.labels = labels;
     }
 
-    @Deprecated
     public BaseImageRecordReader(int height, int width, int channels, boolean appendLabel) {
         this.appendLabel = appendLabel;
         this.height = height;
@@ -129,6 +136,14 @@ public abstract class BaseImageRecordReader extends BaseRecordReader {
         if (imageLoader == null) {
             imageLoader = new NativeImageLoader(height, width, channels, imageTransform);
         }
+        if (appendLabel && labelGenerator == null) {
+            if (split instanceof FileSplit) {
+                FileSplit split1 = (FileSplit) split;
+                labelGenerator = new PathListLabelGenerator(split1.getRootDir());
+            } else {
+            	appendLabel = false;
+            }
+        } 
         inputSplit = split;
         Collection<File> allFiles;
         URI[] locations = split.locations();
