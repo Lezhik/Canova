@@ -14,10 +14,10 @@ import org.canova.api.writable.Writable;
  *
  * @author Lezhik
  */
-public class PathListLabelGenerator implements PathLabelGenerator {
+public class RootDirLabelGenerator implements PathLabelGenerator {
 	protected String[] locations;
 	
-	public PathListLabelGenerator(File rootDir) {
+	public RootDirLabelGenerator(File rootDir) {
 		ArrayList<String> paths = new ArrayList<String>();
 		for(File child: rootDir.listFiles()) {
 			if (child.isDirectory()) {
@@ -26,6 +26,13 @@ public class PathListLabelGenerator implements PathLabelGenerator {
 		}
 		locations = new String[paths.size()];
 		paths.toArray(locations);
+	}
+	
+	public RootDirLabelGenerator(String[] locations) {
+		this.locations = new String[locations.length];
+		for(int i = 0; i < locations.length; i++) {
+			this.locations[i] = FilenameUtils.normalize(locations[i]);
+		}
 	}
 	
 	@Override

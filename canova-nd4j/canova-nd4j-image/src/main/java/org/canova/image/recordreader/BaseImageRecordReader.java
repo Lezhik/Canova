@@ -24,7 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.canova.api.conf.Configuration;
 import org.canova.api.io.data.DoubleWritable;
 import org.canova.api.io.labels.PathLabelGenerator;
-import org.canova.api.io.labels.PathListLabelGenerator;
+import org.canova.api.io.labels.RootDirLabelGenerator;
 import org.canova.api.records.reader.BaseRecordReader;
 import org.canova.api.split.FileSplit;
 import org.canova.api.split.InputSplit;
@@ -131,6 +131,14 @@ public abstract class BaseImageRecordReader extends BaseRecordReader {
     }
 
 
+    /**
+     * Called once at initialization. If there is not PathLabelGenerator specified
+     * and split is an instance of FileSplit then new RootDirLabelGenerator is created
+     * (If appendLabel is true. appendLabel is true by default).
+     * 
+     * @param split          the split that defines the range of records to read
+     * @throws java.io.IOException
+     */
     @Override
     public void initialize(InputSplit split) throws IOException {
         if (imageLoader == null) {
@@ -139,7 +147,7 @@ public abstract class BaseImageRecordReader extends BaseRecordReader {
         if (appendLabel && labelGenerator == null) {
             if (split instanceof FileSplit) {
                 FileSplit split1 = (FileSplit) split;
-                labelGenerator = new PathListLabelGenerator(split1.getRootDir());
+                labelGenerator = new RootDirLabelGenerator(split1.getRootDir());
             } else {
             	appendLabel = false;
             }
